@@ -1,54 +1,91 @@
 # Portfolio Risk Analyzer
 
-## Overview
-The Portfolio Risk Analyzer is a Python project that utilizes Monte Carlo Simulation to estimate the Value at Risk (VaR) of a portfolio. This tool is designed for financial analysts and risk managers to assess potential losses in their investment portfolios under various market conditions.
+A Python tool for simulating and analyzing portfolio risk using Monte Carlo simulation, historical data, and advanced risk metrics.  
+Now with a user-friendly **web interface** powered by Streamlit!
+
+---
 
 ## Features
-- **Data Handling**: Fetch and preprocess historical asset price data using the `yfinance` library.
-- **Monte Carlo Simulation**: Simulate potential future asset prices to estimate risk.
-- **Value at Risk (VaR) Calculation**: Calculate VaR based on simulation results.
-- **Visualization**: Visualize simulation results and VaR estimates using Matplotlib and Seaborn.
-- **Correlation and Covariance Analysis**: Optional analysis of asset returns to understand relationships and risk exposure.
 
-## Installation
-To set up the project, clone the repository and install the required dependencies:
+- **Fetch historical data** for any set of tickers (via yfinance)
+- **Monte Carlo simulation** of correlated asset price paths
+- **Portfolio-level analysis** with custom weights
+- **Risk metrics:** VaR, CVaR, Sharpe Ratio, Max Drawdown
+- **Correlation & covariance matrix visualization**
+- **Distribution plots** of simulated returns
+- **Interactive web UI** (Streamlit) for easy use
 
-```bash
-git clone <repository-url>
-cd portfolio-risk-analyzer
+---
+
+## Quick Start
+
+### 1. Install requirements
+
+```sh
 pip install -r requirements.txt
 ```
 
-## Usage
-1. **Data Handling**: Use the `fetch_data` function from `data_handling.py` to retrieve historical price data for your assets.
-2. **Run Simulation**: Create an instance of `MonteCarloSimulator` from `simulation.py` and call `run_simulation` to generate price paths.
-3. **Calculate VaR**: Use the `calculate_var` function from `var_estimation.py` to compute the VaR from the simulation results.
-4. **Visualize Results**: Utilize the plotting functions in `visualization.py` to visualize the simulation outcomes and VaR distribution.
+### 2. Run the web app
 
-## Example
+```sh
+streamlit run app.py
+```
+
+Open the local URL shown in your terminal.
+
+---
+
+## Usage
+
+- Select tickers, weights, date range, simulation count, and confidence level in the sidebar.
+- Click **Run Analysis** to view:
+  - Portfolio risk metrics (VaR, CVaR, Sharpe Ratio, Max Drawdown)
+  - Simulated price paths for each asset
+  - Simulated portfolio value paths
+  - Correlation and covariance heatmaps
+  - Distribution of simulated portfolio returns
+
+---
+
+## Project Structure
+
+```
+src/
+  data_handling.py
+  simulation.py
+  var_estimation.py
+  visualization.py
+app.py
+requirements.txt
+README.md
+```
+
+---
+
+## Example (Python API)
+
 ```python
 from src.data_handling import fetch_data, preprocess_data
 from src.simulation import MonteCarloSimulator
 from src.var_estimation import calculate_var
 from src.visualization import plot_simulation_results
 
-# Fetch and preprocess data
 data = fetch_data(['AAPL', 'MSFT'], '2020-01-01', '2023-01-01')
-processed_data = preprocess_data(data)
-
-# Run Monte Carlo simulation
-simulator = MonteCarloSimulator(processed_data)
-simulator.run_simulation(num_simulations=10000, time_horizon=252)
-
-# Calculate VaR
-var_results = calculate_var(simulator.get_simulation_results(), confidence_level=0.95)
-
-# Visualize results
-plot_simulation_results(simulator.get_simulation_results())
+returns = preprocess_data(data)
+simulator = MonteCarloSimulator(returns)
+simulator.run_simulation(num_simulations=1000, time_horizon=252)
+sim_results = simulator.get_simulation_results()
+plot_simulation_results(sim_results, asset_names=['AAPL', 'MSFT'])
 ```
 
-## Contributing
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+---
+
+## Requirements
+
+See `requirements.txt` for all dependencies.
+
+---
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+
+MIT License
