@@ -5,26 +5,27 @@ class MonteCarloSimulator:
         self.returns = returns
         self.simulations = None
 
-    def run_simulation(self, num_simulations=10000, time_horizon=252):
-        # Number of assets
+    def run_simulation(self, num_simulations=1000, time_horizon=252):
         num_assets = self.returns.shape[1]
-        # Initialize simulations: shape (num_simulations, time_horizon + 1, num_assets)
-        self.simulations = np.zeros((num_simulations, time_horizon + 1, num_assets))
-        last_prices = self.returns.iloc[-1]  # This should be the last known price, but you have returns, so use 1.0 as base
+        mean_returns = self.returns.mean().values
+        cov_matrix = self.returns.cov().values
 
-        # Calculate mean and covariance of returns
-        mean_returns = self.returns.mean()
-        cov_matrix = self.returns.cov()
+        # Cholesky decomposition for correlated random numbers
+        chol = np.linalg.cholesky(cov_matrix)
 
-        for i in range(num_simulations):
-            prices = np.ones(num_assets)  # Start at 1.0 for each asset
-            price_path = [prices.copy()]
-            for _ in range(time_horizon):
-                # Simulate correlated returns
-                simulated_returns = np.random.multivariate_normal(mean_returns, cov_matrix)
-                prices = prices * (1 + simulated_returns)
-                price_path.append(prices.copy())
-            self.simulations[i] = price_path
+        # Generate all random numbers at once
+        rand_normals = np.random.normal(size=(num_simulations, time_horizon, num_assets))
+        correlated_randoms = rand_normals @ chol.T
+
+        # Add mean to each step
+        correlated_randoms += mean_returns
+
+        # Start all simulations at 1.0
+        prices = np.ones((num_simulations, time_horizon + 1, num_assets))
+        for t in range(1, time_horizon + 1):
+            prices[:, t, :] = prices[:, t - 1, :] * (1 + correlated_randoms[:, t - 1, :])
+
+        self.simulations = prices
 
     def get_simulation_results(self):
         return self.simulations

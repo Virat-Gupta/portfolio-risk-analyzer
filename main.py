@@ -15,4 +15,4 @@ simulator.run_simulation(num_simulations=10000, time_horizon=252)
 var_results = calculate_var(simulator.get_simulation_results(), confidence_level=0.95)
 
 # Visualize results
-plot_simulation_results(simulator.get_simulation_results())
+plot_simulation_results(simulator.get_simulation_results(), asset_names=['AAPL', 'MSFT'])
